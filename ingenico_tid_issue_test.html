@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ingenico TID checker</title>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          const checkButton = document.getElementById('checkButton');
+          const numberListInput = document.getElementById('numberList');
+          const resultDiv = document.getElementById('result');
+
+          checkButton.addEventListener('click', function () {
+              
+              const inputNumbers = numberListInput.value.split('\n').map(Number);
+              const validNumbers = inputNumbers.filter(number => !Number.isNaN(number));
+
+              if (validNumbers.length === 0) {
+                  resultDiv.textContent = 'Please enter valid numbers.';
+                  return;
+              }
+
+              szResultTable = "<table border='1'> <thead>"
+                            + "<tr>"
+                            + "<th>TID</th>"
+                            + "<th>Hex Value</th>"
+                            + "<th>Result</th>"
+                            + "<th>TMS Value</th>"
+                            + "</tr>"
+                            + "</thead> <tbody>";
+
+              for (const number of validNumbers) {
+                  if (number.length == 0
+                      || number == 0)
+                    continue;
+
+                  szValue = number.toString(16);
+
+                  if (szValue.length % 2 == 1) {
+                    szValue = '0' + szValue;
+                  }
+
+                  nCurrentStart = 0;
+
+                  bProblem = false;
+                  szTmsValue = "";
+
+                  while (nCurrentStart < szValue.length) {
+                      if (szValue.substring(nCurrentStart, nCurrentStart + 2) == "00") {
+                          bProblem = true;
+
+                          szTmsValue = szValue.substring(0, nCurrentStart);
+                          szTmsValue = parseInt(szTmsValue, 16).toString();
+
+                          while (szTmsValue.length < 8) {
+                            szTmsValue = '0' + szTmsValue;
+                          }
+
+                          break;
+                      }
+
+                      nCurrentStart += 2;
+                  }
+
+                  if (bProblem) {
+                    szResultTable += '<tr> <td>' + number + '</td> <td>' + szValue + '</td> <td>' + 'ERROR' + '</td> <td>' + szTmsValue + '</td> </tr>';
+
+                  } else {
+                    szResultTable += '<tr> <td>' + number + '</td> <td>' + szValue + '</td> <td>' + 'OK' + '</td> <td>' + '-' + '</td> </tr>';
+                  }
+              }
+
+              resultDiv.innerHTML = szResultTable + "</tbody> </table>";
+          });
+      });
+    </script>
+  </head>
+  <body>
+    <p>
+      <label for="numberList">Enter TIDs (one per line):</label>
+    </p>
+    <textarea id="numberList" rows="5"></textarea>
+    <button id="checkButton">Check TIDs</button>
+    <div id="result" />
+  </body>
+</html>
