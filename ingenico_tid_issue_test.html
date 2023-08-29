@@ -4,6 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ingenico TID checker</title>
+    <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      text-align: center;
+    }
+    th, td {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+    tr.error {
+      background-color: #FFBBBB;
+    }
+    tr.ok {
+      background-color: #CCFFCC;
+    }
+    </style>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
           const checkButton = document.getElementById('checkButton');
@@ -20,7 +37,7 @@
                   return;
               }
 
-              szResultTable = "<table border='1'> <thead>"
+              szResultTable = "<table> <thead>"
                             + "<tr>"
                             + "<th>TID</th>"
                             + "<th>Hex Value</th>"
@@ -34,12 +51,17 @@
                       || number == 0)
                     continue;
 
+                  numberString = number.toString();
                   szValue = number.toString(16);
 
                   if (szValue.length % 2 == 1) {
                     szValue = '0' + szValue;
                   }
 
+                  while (numberString.length < 8) {
+                    numberString = '0' + numberString;
+                  }
+                  
                   nCurrentStart = 0;
 
                   bProblem = false;
@@ -63,10 +85,10 @@
                   }
 
                   if (bProblem) {
-                    szResultTable += '<tr> <td>' + number + '</td> <td>' + szValue + '</td> <td>' + 'ERROR' + '</td> <td>' + szTmsValue + '</td> </tr>';
+                    szResultTable += '<tr class="error"> <td>' + numberString + '</td> <td>' + szValue + '</td> <td>' + 'ERROR' + '</td> <td>' + szTmsValue + '</td> </tr>';
 
                   } else {
-                    szResultTable += '<tr> <td>' + number + '</td> <td>' + szValue + '</td> <td>' + 'OK' + '</td> <td>' + '-' + '</td> </tr>';
+                    szResultTable += '<tr class="ok"> <td>' + numberString + '</td> <td>' + szValue + '</td> <td>' + 'OK' + '</td> <td>' + '-' + '</td> </tr>';
                   }
               }
 
